@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:store/screens/user_product_screen.dart';
 
 import './screens/products_overview_screen.dart';
 import './screens/product_details_screen.dart';
 import './providers/products_provider.dart';
 import './providers/cart.dart';
-
+import './screens/cart_screen.dart';
+import './providers/orders.dart';
+import './screens/orders_screen.dart';
+import 'screens/edit_product_screen.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -23,7 +27,11 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (ctx) => Cart(),
-        )
+        ),
+        // another method of adding provider
+        ChangeNotifierProvider.value(
+          value: Orders(),
+        ),
       ],
       child: MaterialApp(
         title: 'My Shop',
@@ -33,7 +41,13 @@ class MyApp extends StatelessWidget {
           fontFamily: 'Lato',
         ),
         home: ProductOverviewScreen(),
-        routes: {PoductDetailsScreen.routeName: (ctx) => PoductDetailsScreen()},
+        routes: {
+          PoductDetailsScreen.routeName: (ctx) => PoductDetailsScreen(),
+          CartScreen.routeName: (ctx) => CartScreen(),
+          OrdersScreen.routeName: (ctx) => OrdersScreen(),
+          UserProductScreen.routeName: (ctx) => UserProductScreen(),
+          EditProduct.routeName: (ctx)=> EditProduct(),
+        },
       ),
     );
   }
