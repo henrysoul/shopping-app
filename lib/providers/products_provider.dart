@@ -11,7 +11,6 @@ class ProductsProvider with ChangeNotifier {
       price: 29.99,
       imageUrl:
           'https://cdn.pixabay.com/photo/2016/10/02/22/17/red-t-shirt-1710578_1280.jpg',
-     
     ),
     Product(
       id: 'p2',
@@ -20,7 +19,6 @@ class ProductsProvider with ChangeNotifier {
       price: 59.99,
       imageUrl:
           'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Trousers%2C_dress_%28AM_1960.022-8%29.jpg/512px-Trousers%2C_dress_%28AM_1960.022-8%29.jpg',
-    
     ),
     Product(
       id: 'p3',
@@ -47,13 +45,35 @@ class ProductsProvider with ChangeNotifier {
   }
 
 // this returns a type product
-  Product findById(String id){
-    return _items.firstWhere((prod)=>prod.id == id);
+  Product findById(String id) {
+    return _items.firstWhere((prod) => prod.id == id);
   }
 
-  List<Product> get favoriteItems{
+  List<Product> get favoriteItems {
     return _items.where((prodItem) => prodItem.isFavorite).toList();
   }
 
-  void addProduct() {}
+  void addProduct(Product product) {
+    final newProduct = Product(
+      id: DateTime.now().toString(),
+      title: product.title,
+      description: product.description,
+      imageUrl: product.imageUrl,
+      price: product.price,
+    );
+    _items.add(newProduct);
+    // not insert adds to the beginig add adds to the end
+    notifyListeners();
+  }
+
+   void updateProduct(String id, Product newProduct){
+     final prodIndex = _items.indexWhere((prod)=>prod.id == id);
+     _items[prodIndex] = newProduct;
+     notifyListeners();
+   }
+
+   void deleteProduct(String id){
+     _items.removeWhere((prod) => prod.id == id);
+     notifyListeners();
+   }
 }

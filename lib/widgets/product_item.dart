@@ -24,7 +24,7 @@ class ProductItem extends StatelessWidget {
     // you might alternatively splint the changing part to new widget and listen there
     final product = Provider.of<Product>(context);
     // not interested to changes in cart so false. just wanna dispatch actions
-    final cart = Provider.of<Cart>(context,listen: false);
+    final cart = Provider.of<Cart>(context, listen: false);
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
       child: GridTile(
@@ -62,6 +62,27 @@ class ProductItem extends StatelessWidget {
             icon: Icon(Icons.shopping_cart),
             onPressed: () {
               cart.addItem(product.id, product.price, product.title);
+              // scafold.ofcontext establishes connection to the nearest scafold which is the scafold on product over view
+              // Scaffold.of(context).openDrawer();
+
+              // to hide the current one if present and snackbar shown new one
+              Scaffold.of(context).hideCurrentSnackBar();
+              Scaffold.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'Added to cart',
+                  ),
+                  duration: Duration(
+                    seconds: 2,
+                  ),
+                  action: SnackBarAction(
+                    label: 'UNDO',
+                    onPressed: () {
+                      cart.removeItem(product.id);
+                    },
+                  ),
+                ),
+              );
             },
             color: Theme.of(context).accentColor,
           ),
