@@ -18,10 +18,10 @@ class ProductItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // using provider like this without listen false will rebuild the whole widget after the listener listen to the change
+    // using provider like this without listen false will rebuild the whole widget after the listener listens to the change
     // for the case i am only interested in chages of the fave icon button i only wanna rebuild the icon not the whole widget so i will wrap
     // the fave icon with consumer then set provider listen to false not to rebuld the whole widget
-    // you might alternatively splint the changing part to new widget and listen there
+    // you might alternatively split the changing part to new widget and listen there
     final product = Provider.of<Product>(context);
     // not interested to changes in cart so false. just wanna dispatch actions
     final cart = Provider.of<Cart>(context, listen: false);

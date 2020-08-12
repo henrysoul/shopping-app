@@ -8,6 +8,11 @@ import '../widgets/user_product_item.dart';
 
 class UserProductScreen extends StatelessWidget {
   static const routeName = '/user-products';
+
+// to get the context becaue i am not in a stateful widget i need to pass the build context
+  Future<void> refreshProducts(BuildContext context) async{
+    await Provider.of<ProductsProvider>(context).fetchAndSetProducts();
+  }
   @override
   Widget build(BuildContext context) {
     final productData = Provider.of<ProductsProvider>(context);
@@ -24,22 +29,25 @@ class UserProductScreen extends StatelessWidget {
         ],
       ),
       drawer: SideDrawer(),
-      body: Padding(
-        padding: EdgeInsets.all(8),
-        child: ListView.builder(
-          itemBuilder: (ctx, i) => Column(
-            children: <Widget>[
-              UserProductItem(
-                productData.items[i].id,
-                productData.items[i].title,
-                productData.items[i].imageUrl,
-              ),
-              Divider(
-                thickness: 5,
-              ),
-            ],
+      body: RefreshIndicator(
+        onRefresh:()=>refreshProducts(context),
+        child: Padding(
+          padding: EdgeInsets.all(8),
+          child: ListView.builder(
+            itemBuilder: (ctx, i) => Column(
+              children: <Widget>[
+                UserProductItem(
+                  productData.items[i].id,
+                  productData.items[i].title,
+                  productData.items[i].imageUrl,
+                ),
+                Divider(
+                  thickness: 5,
+                ),
+              ],
+            ),
+            itemCount: productData.items.length,
           ),
-          itemCount: productData.items.length,
         ),
       ),
     );

@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
+
 class Product with ChangeNotifier {
   final String id;
   final String title;
@@ -16,8 +20,26 @@ class Product with ChangeNotifier {
     @required this.price,
   });
 
-  void toggleFavoriteStatus(){
+  void setValue(bool newValue){
+    isFavorite = newValue;
+    notifyListeners();
+  }
+  Future<void> toggleFavoriteStatus() async {
+    final url = 'https://shop-19e29.firebaseio.com/products/$id.json';
+    final oldStatus = isFavorite;
     isFavorite = !isFavorite;
     notifyListeners();
+    try {
+      // http only throws error for post and get you need to handle the error for patch put etc
+      final response = await http.patch(
+        url,
+        body: json.encode({'isFavorite': isFavorite}),
+      );
+      if (response.statusCode >= 400) {
+        setValue(oldStatus);
+      }
+    } catch (error) {
+      setValue(oldStatus);
+    }
   }
 }

@@ -20,7 +20,7 @@ class ProductsGrid extends StatelessWidget {
       // i am using create to pass the provider because of the version of my flutter i could have used build
       // i passed a single products[i] because one is render at a time in my gridview.builder at a time,
       // check main.dart for how products is passed to this screen widget
-      // 
+      
       itemBuilder: (context, i) => ChangeNotifierProvider.value(
           value:products[i] ,
           // this product is now passed to the product details page through the product provider and checked for favorite
