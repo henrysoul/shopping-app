@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/foundation.dart';
-import 'package:store/widgets/cart_item.dart';
 
 class CartItem {
   final String id;
