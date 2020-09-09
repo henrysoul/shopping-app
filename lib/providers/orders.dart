@@ -23,6 +23,10 @@ class OrderItem {
 // we wanna listen to the changess
 class Orders with ChangeNotifier {
   List<OrderItem> _orders = [];
+  final String authToken;
+  final String userId;
+
+  Orders(this.authToken, this._orders,this.userId);
 
   List<OrderItem> get orders {
     // spread so _orders cannot be changed from outside this class
@@ -30,7 +34,8 @@ class Orders with ChangeNotifier {
   }
 
   Future<void> fetchAndSetOrders() async {
-    final url = 'https://shop-19e29.firebaseio.com/orders.json';
+    // fetching orders by useId
+    final url = 'https://shop-19e29.firebaseio.com/orders/$userId.json?auth=$authToken';
     try {
       final response = await http.get(url);
       final List<OrderItem> loadedOrders = [];
@@ -62,6 +67,7 @@ class Orders with ChangeNotifier {
       _orders = loadedOrders.reversed.toList();
       notifyListeners();
     } catch (error) {
+      print(error);
       throw error;
     }
   }
@@ -70,7 +76,8 @@ class Orders with ChangeNotifier {
     // .add adds at the ending of the list; insert(index,elemnt) adds at the begining of the list
     // i want more recent orders to be at the begining of the list
 
-    const url = 'https://shop-19e29.firebaseio.com/orders.json';
+    // adding orders by UserId
+    final url = 'https://shop-19e29.firebaseio.com/orders/$userId.json?auth=$authToken';
     final timeStamp = DateTime.now();
     try {
       final response = await http.post(url,
@@ -98,6 +105,8 @@ class Orders with ChangeNotifier {
         ),
       );
       notifyListeners();
-    } catch (e) {}
+    } catch (error) {
+      throw error;
+    }
   }
 }
