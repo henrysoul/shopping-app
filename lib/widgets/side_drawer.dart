@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import 'package:store/screens/user_product_screen.dart';
 import '../screens/cart_screen.dart';
 import '../screens/orders_screen.dart';
+import '../providers/auth.dart';
+import '../helpers/custom_route.dart';
 
 class SideDrawer extends StatelessWidget {
   Widget menuItem(String text, context,IconData icon, Function menuItemFunction) {
@@ -47,7 +51,8 @@ class SideDrawer extends StatelessWidget {
             Icons.payment,
             () {
               Navigator.of(context)
-                  .pushReplacementNamed(OrdersScreen.routeName);
+                  .pushReplacement(CustomRoute(builder: (ctx) => OrdersScreen()));
+                  // .pushReplacementNamed(OrdersScreen.routeName);
             },
           ),
           menuItem(
@@ -63,6 +68,16 @@ class SideDrawer extends StatelessWidget {
             Icons.edit,
             () {
               Navigator.of(context).pushNamed(UserProductScreen.routeName);
+            },
+          ),
+          menuItem(
+            'Logout',
+            context,
+            Icons.exit_to_app,
+            () {
+              // pop the drawer before logging out
+              Navigator.of(context).pop();
+              Provider.of<Auth>(context,listen: false).logout();
             },
           )
         ],

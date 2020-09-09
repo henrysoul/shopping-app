@@ -43,8 +43,22 @@ class ProductsProvider with ChangeNotifier {
 
   // var _showFavoritesOnly = false;
 
-  Future<void> fetchAndSetProducts() async {
-    const url = 'https://shop-19e29.firebaseio.com/products.json';
+  final String authToken;
+  final String userId;
+  ProductsProvider(this.authToken, this.userId, this._items);
+
+  // on the products overview screen i wanna see all products but on manage product i wanna see procudts by user
+  // [] arround a positional argument makes it optional
+  Future<void> fetchAndSetProducts([bool filterByUser = false]) async {
+    // i need to add the token to get products if logged in
+    // see main.dart on how i implemented getting the token from auth through ChangeNotifierWithProxyProvider
+
+    final filerString = filterByUser? 'orderBy="userId"&equalTo="$userId"' : '';
+    // i want to implement search by userId so products can be gotten based on user id using some
+    // featues provided by firebase
+    // on my firebase auth i need to do the indexOn produts in the rules tab
+    // then i can now use &orderBy="userId"&equalTo provided by firebase
+    var url = 'https://shop-19e29.firebaseio.com/products.json?auth=$authToken&$filerString';
     try {
       final response = await http.get(url);
       final extractedData = json.decode(response.body) as Map<String, dynamic>;
@@ -52,20 +66,29 @@ class ProductsProvider with ChangeNotifier {
       if (extractedData == null) {
         return;
       }
+      url =
+          'https://shop-19e29.firebaseio.com/userFavorites/$userId.json?auth=$authToken';
+      final favoriteResponse = await http.get(url);
+      final favoriteData = json.decode(favoriteResponse.body);
       extractedData.forEach((prodId, prodData) {
-        loadedProducts.add(Product(
-          id: prodId,
-          title: prodData['title'],
-          description: prodData['description'],
-          imageUrl: prodData['imageUrl'],
-          price: prodData['price'],
-          isFavorite: prodData['isFavorite'],
-        ));
+        loadedProducts.add(
+          Product(
+            id: prodId,
+            title: prodData['title'],
+            description: prodData['description'],
+            imageUrl: prodData['imageUrl'],
+            price: prodData['price'],
+            // this expression   favoriteData[prodId] ?? false  means
+            // if favoriteData[prodId] is not null use favoriteData[prodId] else use false
+            isFavorite:favoriteData == null ? false : favoriteData[prodId] ?? false,
+          ),
+        );
       });
       _items = loadedProducts;
       notifyListeners();
     } catch (error) {
       // i throw so it can be handled in the widget
+      print(error);
       throw error;
     }
   }
@@ -88,7 +111,8 @@ class ProductsProvider with ChangeNotifier {
 // implementing the future using async and wait and try and catch for handling the error
 // i wanna return type future
   Future<void> addProduct(Product product) async {
-    const url = 'https://shop-19e29.firebaseio.com/products.json';
+    final url =
+        'https://shop-19e29.firebaseio.com/products.json?auth=$authToken';
     try {
       // i saved this in response because http retuns something
       final response = await http.post(
@@ -98,7 +122,8 @@ class ProductsProvider with ChangeNotifier {
           'description': product.description,
           'imageUrl': product.imageUrl,
           'isFavorite': product.isFavorite,
-          'price': product.price
+          'price': product.price,
+          'userId': userId
         }),
       );
 
@@ -159,7 +184,8 @@ class ProductsProvider with ChangeNotifier {
   Future<void> updateProduct(String id, Product newProduct) async {
     final prodIndex = _items.indexWhere((prod) => prod.id == id);
     if (prodIndex >= 0) {
-      final url = 'https://shop-19e29.firebaseio.com/products/$id.json';
+      final url =
+          'https://shop-19e29.firebaseio.com/products/$id.json?auth=$authToken';
       await http.patch(
         url,
         body: json.encode({
@@ -176,7 +202,8 @@ class ProductsProvider with ChangeNotifier {
   }
 
   Future<void> deleteProduct(String id) {
-    final url = 'https://shop-19e29.firebaseio.com/products/$id.json';
+    final url =
+        'https://shop-19e29.firebaseio.com/products/$id.json?auth=$authToken';
     final existingProductIndex = _items.indexWhere((prod) => prod.id == id);
     var existingProduct = _items[existingProductIndex];
 
